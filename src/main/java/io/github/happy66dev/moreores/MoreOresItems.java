@@ -57,6 +57,39 @@ public final class MoreOresItems {
     public static final SlimefunItemStack CARNALLITE = new SlimefunItemStack(
             "CARNALLITE", Material.DIAMOND_ORE, "&d光卤石", "", "&7通过GEO矿机在任意群系获得"
     );
+    public static final SlimefunItemStack GALENA = new SlimefunItemStack(
+            "GALENA", Material.PURPLE_DYE, "&5方铅矿", "", "&7挖掘铜矿有概率获得"
+    );
+    public static final SlimefunItemStack CERUSSITE = new SlimefunItemStack(
+            "CERUSSITE", Material.WHITE_DYE, "&f白铅矿", "", "&7挖掘铜矿有概率获得"
+    );
+    public static final SlimefunItemStack ANGLESITE = new SlimefunItemStack(
+            "ANGLESITE", Material.LIGHT_GRAY_DYE, "&7铅矾", "", "&7挖掘铜矿有概率获得"
+    );
+    public static final SlimefunItemStack CROCOITE = new SlimefunItemStack(
+            "CROCOITE", Material.ORANGE_DYE, "&6铬铅矿", "", "&7挖掘深层铁矿有概率获得"
+    );
+    public static final SlimefunItemStack BOULANGERITE = new SlimefunItemStack(
+            "BOULANGERITE", Material.GRAY_DYE, "&8硫锑铅矿", "", "&7挖掘青金石矿有概率获得"
+    );
+    public static final SlimefunItemStack JAMESONITE = new SlimefunItemStack(
+            "JAMESONITE", Material.BLACK_DYE, "&0脆硫锑铅矿", "", "&7挖掘绿宝石矿有概率获得"
+    );
+    public static final SlimefunItemStack VANADINITE = new SlimefunItemStack(
+            "VANADINITE", Material.RED_DYE, "&c钒铅矿", "", "&7挖掘深层红石矿有概率获得"
+    );
+    public static final SlimefunItemStack WULFENITE = new SlimefunItemStack(
+            "WULFENITE", Material.GLOWSTONE, "&e钼铅矿", "", "&7挖掘钻石矿有概率获得"
+    );
+    public static final SlimefunItemStack PYROMORPHITE = new SlimefunItemStack(
+            "PYROMORPHITE", Material.LIME_DYE, "&a磷氯铅矿", "", "&7通过GEO矿机在河流/湖泊/海洋群系获得"
+    );
+    public static final SlimefunItemStack MIMETITE = new SlimefunItemStack(
+            "MIMETITE", Material.YELLOW_DYE, "&e砷铅矿", "", "&7通过GEO矿机在地狱获得"
+    );
+    public static final SlimefunItemStack BOURNONITE = new SlimefunItemStack(
+            "BOURNONITE", Material.GRAY_DYE, "&7车轮矿", "", "&7通过GEO矿机在雪原群系获得"
+    );
 
     private static final ItemStack[] NULL_RECIPE = new ItemStack[] {
             null, null, null, null, null, null, null, null, null
@@ -86,6 +119,19 @@ public final class MoreOresItems {
         registerGeoOre(BISCHOFITE, "bischofite", "水氯镁石", 3);
         registerGeoOre(BRINE, "brine", "卤水", 3);
         registerGeoOre(CARNALLITE, "carnallite", "光卤石", 3);
+
+        registerDropOre(GALENA, "galena", "方铅矿", 2);
+        registerDropOre(CERUSSITE, "cerussite", "白铅矿", 2);
+        registerDropOre(ANGLESITE, "anglesite", "铅矾", 2);
+        registerDropOre(CROCOITE, "crocoite", "铬铅矿", 2);
+        registerDropOre(BOULANGERITE, "boulangerite", "硫锑铅矿", 2);
+        registerDropOre(JAMESONITE, "jamesonite", "脆硫锑铅矿", 2);
+        registerDropOre(VANADINITE, "vanadinite", "钒铅矿", 2);
+        registerDropOre(WULFENITE, "wulfenite", "钼铅矿", 2);
+
+        registerGeoOre(PYROMORPHITE, "pyromorphite", "磷氯铅矿", 3);
+        registerGeoOre(MIMETITE, "mimetite", "砷铅矿", 3);
+        registerGeoOre(BOURNONITE, "bournonite", "车轮矿", 3);
     }
 
     private static void registerDropOre(SlimefunItemStack item, String key, String name, int cost) {

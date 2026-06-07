@@ -25,12 +25,26 @@ public final class MoreOresResources {
             Biome.WINDSWEPT_FOREST
     );
 
+    private static final Set<Biome> RIVER_BIOMES = Set.of(
+            Biome.RIVER, Biome.FROZEN_RIVER
+    );
+
+    private static final Set<Biome> SNOWY_BIOMES = Set.of(
+            Biome.SNOWY_PLAINS, Biome.SNOWY_TAIGA, Biome.SNOWY_BEACH,
+            Biome.ICE_SPIKES, Biome.FROZEN_OCEAN, Biome.DEEP_FROZEN_OCEAN,
+            Biome.FROZEN_RIVER, Biome.FROZEN_PEAKS, Biome.JAGGED_PEAKS,
+            Biome.SNOWY_SLOPES, Biome.GROVE
+    );
+
     private MoreOresResources() {}
 
     public static void registerAll() {
         new BischofiteResource().register();
         new BrineResource().register();
         new CarnalliteResource().register();
+        new PyromorphiteResource().register();
+        new MimetiteResource().register();
+        new BournoniteResource().register();
     }
 
     static abstract class MoreOresGeoResource implements GEOResource {
@@ -144,6 +158,114 @@ public final class MoreOresResources {
         public int getMaxDeviation() {
             int max = MoreOres.getInstance().getConfig().getInt("geo_miner.carnallite.max", 3);
             int min = MoreOres.getInstance().getConfig().getInt("geo_miner.carnallite.min", 1);
+            return max - min;
+        }
+    }
+
+    static class PyromorphiteResource extends MoreOresGeoResource {
+        private final NamespacedKey key = new NamespacedKey(MoreOres.getInstance(), "pyromorphite");
+
+        @Override
+        public NamespacedKey getKey() {
+            return key;
+        }
+
+        @Override
+        @Nonnull
+        public String getName() {
+            return "磷氯铅矿";
+        }
+
+        @Override
+        @Nonnull
+        public ItemStack getItem() {
+            return MoreOresItems.PYROMORPHITE.clone();
+        }
+
+        @Override
+        public int getDefaultSupply(@Nonnull World.Environment environment, @Nonnull Biome biome) {
+            if (environment != World.Environment.NORMAL) return 0;
+            if (OCEAN_BIOMES.contains(biome) || RIVER_BIOMES.contains(biome)) {
+                return MoreOres.getInstance().getConfig().getInt("geo_miner.pyromorphite.min", 1);
+            }
+            return 0;
+        }
+
+        @Override
+        public int getMaxDeviation() {
+            int max = MoreOres.getInstance().getConfig().getInt("geo_miner.pyromorphite.max", 5);
+            int min = MoreOres.getInstance().getConfig().getInt("geo_miner.pyromorphite.min", 1);
+            return max - min;
+        }
+    }
+
+    static class MimetiteResource extends MoreOresGeoResource {
+        private final NamespacedKey key = new NamespacedKey(MoreOres.getInstance(), "mimetite");
+
+        @Override
+        public NamespacedKey getKey() {
+            return key;
+        }
+
+        @Override
+        @Nonnull
+        public String getName() {
+            return "砷铅矿";
+        }
+
+        @Override
+        @Nonnull
+        public ItemStack getItem() {
+            return MoreOresItems.MIMETITE.clone();
+        }
+
+        @Override
+        public int getDefaultSupply(@Nonnull World.Environment environment, @Nonnull Biome biome) {
+            if (environment != World.Environment.NETHER) return 0;
+            return MoreOres.getInstance().getConfig().getInt("geo_miner.mimetite.min", 1);
+        }
+
+        @Override
+        public int getMaxDeviation() {
+            int max = MoreOres.getInstance().getConfig().getInt("geo_miner.mimetite.max", 5);
+            int min = MoreOres.getInstance().getConfig().getInt("geo_miner.mimetite.min", 1);
+            return max - min;
+        }
+    }
+
+    static class BournoniteResource extends MoreOresGeoResource {
+        private final NamespacedKey key = new NamespacedKey(MoreOres.getInstance(), "bournonite");
+
+        @Override
+        public NamespacedKey getKey() {
+            return key;
+        }
+
+        @Override
+        @Nonnull
+        public String getName() {
+            return "车轮矿";
+        }
+
+        @Override
+        @Nonnull
+        public ItemStack getItem() {
+            return MoreOresItems.BOURNONITE.clone();
+        }
+
+        @Override
+        public int getDefaultSupply(@Nonnull World.Environment environment, @Nonnull Biome biome) {
+            if (environment != World.Environment.NORMAL) return 0;
+            if (SNOWY_BIOMES.contains(biome)) {
+                return MoreOres.getInstance().getConfig().getInt("geo_miner.bournonite.min", 1);
+            }
+            return 0;
+        }
+
+        @Override
+        public int getMaxDeviation() {
+            int max = MoreOres.getInstance().getConfig().getInt("geo_miner.bournonite.max", 5);
+            int min = MoreOres.getInstance().getConfig().getInt("geo_miner.bournonite.min", 1);
             return max - min;
         }
     }

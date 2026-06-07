@@ -17,6 +17,22 @@ ores:
     chance: 0.01
   red_zincite:
     chance: 0.10
+  galena:
+    chance: 0.08
+  cerussite:
+    chance: 0.04
+  anglesite:
+    chance: 0.02
+  crocoite:
+    chance: 0.03
+  boulangerite:
+    chance: 0.02
+  jamesonite:
+    chance: 0.10
+  vanadinite:
+    chance: 0.05
+  wulfenite:
+    chance: 0.05
 
 geo_miner:
   bischofite:
@@ -28,3 +44,12 @@ geo_miner:
   carnallite:
     min: 1
     max: 3
+  pyromorphite:
+    min: 1
+    max: 5
+  mimetite:
+    min: 1
+    max: 5
+  bournonite:
+    min: 1
+    max: 5

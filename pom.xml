@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.github.happy66dev</groupId>
     <artifactId>MoreOres</artifactId>
-    <version>v0.0.1Alpha</version>
+    <version>v0.0.2Alpha</version>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
