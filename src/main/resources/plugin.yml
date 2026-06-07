@@ -1,0 +1,7 @@
+name: MoreOres
+author: happy
+description: 更多矿物 - Slimefun4 附属插件
+main: io.github.happy66dev.moreores.MoreOres
+depend: [Slimefun]
+api-version: 1.21
+version: ${project.version}

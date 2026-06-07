@@ -1,0 +1,30 @@
+ores:
+  yellow_iron_ore:
+    chance: 0.15
+  bauxite:
+    chance: 0.10
+  blue_corundum:
+    chance: 0.0001
+  red_corundum:
+    chance: 0.0001
+  sphalerite:
+    chance: 0.10
+  stacked_zinc_ore:
+    chance: 0.20
+  smithsonite:
+    chance: 0.10
+  magnesium_zinc_ore:
+    chance: 0.01
+  red_zincite:
+    chance: 0.10
+
+geo_miner:
+  bischofite:
+    min: 1
+    max: 3
+  brine:
+    min: 1
+    max: 3
+  carnallite:
+    min: 1
+    max: 3
