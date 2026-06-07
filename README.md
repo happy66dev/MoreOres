@@ -49,7 +49,7 @@
 
 ## 依赖
 
-- **必须**: [Slimefun4](https://github.com/Slimefun/Slimefun4) (汉化魔改版)
+- **必须**: [Slimefun4](https://github.com/happy66dev/Slimefun4) (汉化魔改版)
 
 ## 开源协议
 
@@ -65,3 +65,7 @@
     <img src="https://img.shields.io/discord/565557184348422174?color=7289DA&label=Discord&style=for-the-badge" alt="Discord Invite"/>
   </a>
 </p>
+
+## ⭐ Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=happy66dev/MoreOres&type=Date)](https://star-history.com/#happy66dev/MoreOres&Date)
