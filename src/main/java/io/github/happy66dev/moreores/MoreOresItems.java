@@ -43,10 +43,10 @@ public final class MoreOresItems {
             "MAGNESIUM_ZINC_ORE", Material.IRON_ORE, "&7镁锌石", "", "&7挖掘石头有概率获得"
     );
     public static final SlimefunItemStack RED_ZINCITE = new SlimefunItemStack(
-            "RED_ZINCITE", Material.REDSTONE_ORE, "&4红锌石", "", "&7通过磨石研磨方解石获得", "&7或挖掘红石矿有概率获得"
+            "RED_ZINCITE", Material.REDSTONE_ORE, "&4红锌石", "", "&7挖掘红石矿有概率获得"
     );
     public static final SlimefunItemStack BRUCITE = new SlimefunItemStack(
-            "BRUCITE", Material.ICE, "&b水镁石", "", "&7通过磨石研磨方解石获得"
+            "BRUCITE", Material.ICE, "&b水镁石", "", "&7通过磨石研磨2个方解石获得"
     );
     public static final SlimefunItemStack BISCHOFITE = new SlimefunItemStack(
             "BISCHOFITE", Material.LAPIS_ORE, "&1水氯镁石", "", "&7通过GEO矿机在海洋/高山群系获得"
@@ -152,8 +152,8 @@ public final class MoreOresItems {
             null, null, null, null, null, null, null, null, null
     };
 
-    private static final ItemStack[] CALCITE_GRIND_RECIPE = new ItemStack[] {
-            new ItemStack(Material.CALCITE), null, null, null, null, null, null, null, null
+    private static final ItemStack[] CALCITE_2_GRIND_RECIPE = new ItemStack[] {
+            new ItemStack(Material.CALCITE, 2), null, null, null, null, null, null, null, null
     };
 
     private static final ItemStack[] POLISHED_GRANITE_GRIND_RECIPE = new ItemStack[] {
@@ -172,6 +172,14 @@ public final class MoreOresItems {
 
     private MoreOresItems() {}
 
+    private static void registerGrindOreCustom(SlimefunItemStack item, String key, String name, int cost, ItemStack[] recipe) {
+        new MoreOresItem(MORE_ORES, item, RecipeType.GRIND_STONE, recipe)
+                .setUseableInWorkbench(false)
+                .register(MoreOres.getInstance());
+        new Research(new NamespacedKey(MoreOres.getInstance(), key), researchId++, name, cost)
+                .addItems(item).register();
+    }
+
     public static void registerAll(MoreOres plugin) {
         registerDropOre(YELLOW_IRON_ORE, "yellow_iron_ore", "黄铁矿石", 1);
         registerDropOre(BAUXITE, "bauxite", "铝土矿", 2);
@@ -181,9 +189,9 @@ public final class MoreOresItems {
         registerDropOre(STACKED_ZINC_ORE, "stacked_zinc_ore", "异锌矿", 1);
         registerDropOre(SMITHSONITE, "smithsonite", "菱锌矿", 1);
         registerDropOre(MAGNESIUM_ZINC_ORE, "magnesium_zinc_ore", "镁锌石", 2);
+        registerDropOre(RED_ZINCITE, "red_zincite", "红锌石", 2);
 
-        registerGrindOre(RED_ZINCITE, "red_zincite", "红锌石", 2);
-        registerGrindOre(BRUCITE, "brucite", "水镁石", 1);
+        registerGrindOreCustom(BRUCITE, "brucite", "水镁石", 1, CALCITE_2_GRIND_RECIPE);
 
         registerGeoOre(BISCHOFITE, "bischofite", "水氯镁石", 3);
         registerGeoOre(BRINE, "brine", "卤水", 3);
@@ -230,9 +238,7 @@ public final class MoreOresItems {
         sphalerite2.setAmount(2);
         registerGrindOreCustom(FREIESLEBENITE, "freieslebenite", "锌锑方辉银矿", 4,
                 new ItemStack[]{sphalerite2, null, null, null, null, null, null, null, null});
-        new MoreOresItem(MORE_ORES, FREIESLEBENITE, RecipeType.GRIND_STONE, POLISHED_BASALT_16_GRIND_RECIPE)
-                .setUseableInWorkbench(false)
-                .register(MoreOres.getInstance());
+        RecipeType.GRIND_STONE.register(POLISHED_BASALT_16_GRIND_RECIPE, FREIESLEBENITE);
 
         registerGeoOre(ARGENTITE, "argentite", "辉银矿", 3);
         registerGeoOre(CERARGYRITE, "cerargyrite", "角银矿", 3);
@@ -247,17 +253,7 @@ public final class MoreOresItems {
                 .addItems(item).register();
     }
 
-    private static void registerGrindOre(SlimefunItemStack item, String key, String name, int cost) {
-        registerGrindOreCustom(item, key, name, cost, CALCITE_GRIND_RECIPE);
-    }
 
-    private static void registerGrindOreCustom(SlimefunItemStack item, String key, String name, int cost, ItemStack[] recipe) {
-        new MoreOresItem(MORE_ORES, item, RecipeType.GRIND_STONE, recipe)
-                .setUseableInWorkbench(false)
-                .register(MoreOres.getInstance());
-        new Research(new NamespacedKey(MoreOres.getInstance(), key), researchId++, name, cost)
-                .addItems(item).register();
-    }
 
     private static void registerGeoOre(SlimefunItemStack item, String key, String name, int cost) {
         new MoreOresItem(MORE_ORES, item, RecipeType.GEO_MINER, NULL_RECIPE)

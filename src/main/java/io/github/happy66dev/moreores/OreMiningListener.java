@@ -11,7 +11,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -24,7 +23,6 @@ public class OreMiningListener implements Listener {
     private static final Set<Material> CORUNDUM_TARGETS = Set.of(Material.DEEPSLATE_EMERALD_ORE);
     private static final Set<Material> SPHALERITE_TARGETS = Set.of(Material.COPPER_ORE);
     private static final Set<Material> ZINC_ORE_TARGETS = Set.of(Material.IRON_ORE);
-    private static final Set<Material> MAGNESIUM_ZINC_TARGETS = Set.of(Material.STONE);
     private static final Set<Material> RED_ZINCITE_TARGETS = Set.of(Material.REDSTONE_ORE);
 
     private static final Set<Material> COPPER_ORE_TARGETS = Set.of(Material.COPPER_ORE, Material.DEEPSLATE_COPPER_ORE);
@@ -101,7 +99,7 @@ public class OreMiningListener implements Listener {
         }
 
         chance = plugin.getConfig().getDouble("ores.magnesium_zinc_ore.chance", 0.01);
-        if (MAGNESIUM_ZINC_TARGETS.contains(broken) && random.nextDouble() < chance) {
+        if (STONE_TARGETS.contains(broken) && random.nextDouble() < chance) {
             dropOre(event, MoreOresItems.MAGNESIUM_ZINC_ORE);
             return;
         }
