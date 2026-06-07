@@ -37,6 +37,11 @@ public class OreMiningListener implements Listener {
     private static final Set<Material> GOLD_ORE_TARGETS = Set.of(Material.GOLD_ORE, Material.DEEPSLATE_GOLD_ORE);
     private static final Set<Material> STONE_TARGETS = Set.of(Material.STONE);
 
+    private static final Set<Material> GOLD_ORE_ONLY = Set.of(Material.GOLD_ORE);
+    private static final Set<Material> NETHER_GOLD_ORE_TARGETS = Set.of(Material.NETHER_GOLD_ORE);
+    private static final Set<Material> NETHER_QUARTZ_ORE_TARGETS = Set.of(Material.NETHER_QUARTZ_ORE);
+    private static final Set<Material> DEEPSLATE_GOLD_ONLY = Set.of(Material.DEEPSLATE_GOLD_ORE);
+
     public OreMiningListener(MoreOres plugin) {
         this.plugin = plugin;
     }
@@ -164,6 +169,42 @@ public class OreMiningListener implements Listener {
         chance = plugin.getConfig().getDouble("ores.canfieldite.chance", 0.03);
         if (STONE_TARGETS.contains(broken) && random.nextDouble() < chance) {
             dropOre(event, MoreOresItems.CANFIELDITE);
+            return;
+        }
+
+        chance = plugin.getConfig().getDouble("ores.electrum.chance", 0.05);
+        if (GOLD_ORE_ONLY.contains(broken) && random.nextDouble() < chance) {
+            dropOre(event, MoreOresItems.ELECTRUM);
+            return;
+        }
+
+        chance = plugin.getConfig().getDouble("ores.pyrargyrite.chance", 0.10);
+        if (NETHER_GOLD_ORE_TARGETS.contains(broken) && random.nextDouble() < chance) {
+            dropOre(event, MoreOresItems.PYRARGYRITE);
+            return;
+        }
+
+        chance = plugin.getConfig().getDouble("ores.proustite.chance", 0.10);
+        if (NETHER_QUARTZ_ORE_TARGETS.contains(broken) && random.nextDouble() < chance) {
+            dropOre(event, MoreOresItems.PROUSTITE);
+            return;
+        }
+
+        chance = plugin.getConfig().getDouble("ores.stephanite.chance", 0.05);
+        if (NETHER_QUARTZ_ORE_TARGETS.contains(broken) && random.nextDouble() < chance) {
+            dropOre(event, MoreOresItems.STEPHANITE);
+            return;
+        }
+
+        chance = plugin.getConfig().getDouble("ores.dyscrasite.chance", 0.05);
+        if (NETHER_GOLD_ORE_TARGETS.contains(broken) && random.nextDouble() < chance) {
+            dropOre(event, MoreOresItems.DYSKRASITE);
+            return;
+        }
+
+        chance = plugin.getConfig().getDouble("ores.hessite.chance", 0.05);
+        if (DEEPSLATE_GOLD_ONLY.contains(broken) && random.nextDouble() < chance) {
+            dropOre(event, MoreOresItems.HESSITE);
         }
     }
 

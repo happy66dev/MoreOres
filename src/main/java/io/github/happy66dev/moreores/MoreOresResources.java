@@ -48,6 +48,8 @@ public final class MoreOresResources {
             Biome.PLAINS, Biome.SUNFLOWER_PLAINS
     );
 
+    private static final Set<Biome> BASALT_DELTAS_BIOME = Set.of(Biome.BASALT_DELTAS);
+
     private MoreOresResources() {}
 
     public static void registerAll() {
@@ -61,6 +63,9 @@ public final class MoreOresResources {
         new CylindriteResource().register();
         new MalayaiteResource().register();
         new VarlamoffiteResource().register();
+        new ArgentiteResource().register();
+        new CerargyriteResource().register();
+        new NaumanniteResource().register();
     }
 
     static abstract class MoreOresGeoResource implements GEOResource {
@@ -427,6 +432,114 @@ public final class MoreOresResources {
         public int getMaxDeviation() {
             int max = MoreOres.getInstance().getConfig().getInt("geo_miner.varlamoffite.max", 3);
             int min = MoreOres.getInstance().getConfig().getInt("geo_miner.varlamoffite.min", 1);
+            return max - min;
+        }
+    }
+
+    static class ArgentiteResource extends MoreOresGeoResource {
+        private final NamespacedKey key = new NamespacedKey(MoreOres.getInstance(), "argentite");
+
+        @Override
+        public NamespacedKey getKey() {
+            return key;
+        }
+
+        @Override
+        @Nonnull
+        public String getName() {
+            return "辉银矿";
+        }
+
+        @Override
+        @Nonnull
+        public ItemStack getItem() {
+            return MoreOresItems.ARGENTITE.clone();
+        }
+
+        @Override
+        public int getDefaultSupply(@Nonnull World.Environment environment, @Nonnull Biome biome) {
+            if (environment != World.Environment.NETHER) return 0;
+            return MoreOres.getInstance().getConfig().getInt("geo_miner.argentite.min", 1);
+        }
+
+        @Override
+        public int getMaxDeviation() {
+            int max = MoreOres.getInstance().getConfig().getInt("geo_miner.argentite.max", 3);
+            int min = MoreOres.getInstance().getConfig().getInt("geo_miner.argentite.min", 1);
+            return max - min;
+        }
+    }
+
+    static class CerargyriteResource extends MoreOresGeoResource {
+        private final NamespacedKey key = new NamespacedKey(MoreOres.getInstance(), "cerargyrite");
+
+        @Override
+        public NamespacedKey getKey() {
+            return key;
+        }
+
+        @Override
+        @Nonnull
+        public String getName() {
+            return "角银矿";
+        }
+
+        @Override
+        @Nonnull
+        public ItemStack getItem() {
+            return MoreOresItems.CERARGYRITE.clone();
+        }
+
+        @Override
+        public int getDefaultSupply(@Nonnull World.Environment environment, @Nonnull Biome biome) {
+            if (environment != World.Environment.NORMAL) return 0;
+            if (DESERT_BADLANDS_BIOMES.contains(biome)) {
+                return MoreOres.getInstance().getConfig().getInt("geo_miner.cerargyrite.min", 1);
+            }
+            return 0;
+        }
+
+        @Override
+        public int getMaxDeviation() {
+            int max = MoreOres.getInstance().getConfig().getInt("geo_miner.cerargyrite.max", 3);
+            int min = MoreOres.getInstance().getConfig().getInt("geo_miner.cerargyrite.min", 1);
+            return max - min;
+        }
+    }
+
+    static class NaumanniteResource extends MoreOresGeoResource {
+        private final NamespacedKey key = new NamespacedKey(MoreOres.getInstance(), "naumannite");
+
+        @Override
+        public NamespacedKey getKey() {
+            return key;
+        }
+
+        @Override
+        @Nonnull
+        public String getName() {
+            return "硒银矿";
+        }
+
+        @Override
+        @Nonnull
+        public ItemStack getItem() {
+            return MoreOresItems.NAUMANNITE.clone();
+        }
+
+        @Override
+        public int getDefaultSupply(@Nonnull World.Environment environment, @Nonnull Biome biome) {
+            if (environment != World.Environment.NETHER) return 0;
+            if (BASALT_DELTAS_BIOME.contains(biome)) {
+                return MoreOres.getInstance().getConfig().getInt("geo_miner.naumannite.min", 1);
+            }
+            return 0;
+        }
+
+        @Override
+        public int getMaxDeviation() {
+            int max = MoreOres.getInstance().getConfig().getInt("geo_miner.naumannite.max", 3);
+            int min = MoreOres.getInstance().getConfig().getInt("geo_miner.naumannite.min", 1);
             return max - min;
         }
     }
