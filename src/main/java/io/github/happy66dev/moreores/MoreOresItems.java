@@ -90,6 +90,30 @@ public final class MoreOresItems {
     public static final SlimefunItemStack BOURNONITE = new SlimefunItemStack(
             "BOURNONITE", Material.GRAY_DYE, "&7车轮矿", "", "&7通过GEO矿机在雪原群系获得"
     );
+    public static final SlimefunItemStack CASSITERITE = new SlimefunItemStack(
+            "CASSITERITE", Material.BROWN_DYE, "&6锡石", "", "&7通过磨石研磨磨制花岗岩获得"
+    );
+    public static final SlimefunItemStack STANNITE = new SlimefunItemStack(
+            "STANNITE", Material.MOSSY_COBBLESTONE, "&2黄锡矿", "", "&7挖掘黄金矿有概率获得"
+    );
+    public static final SlimefunItemStack TEALLITE = new SlimefunItemStack(
+            "TEALLITE", Material.CHARCOAL, "&8硫锡铅矿", "", "&7通过磨石研磨2个方铅矿获得"
+    );
+    public static final SlimefunItemStack FRANCKEITE = new SlimefunItemStack(
+            "FRANCKEITE", Material.DEEPSLATE, "&7辉锑锡铅矿", "", "&7通过GEO矿机在沙漠/恶地群系获得"
+    );
+    public static final SlimefunItemStack CYLINDRITE = new SlimefunItemStack(
+            "CYLINDRITE", Material.BLACKSTONE, "&8圆柱锡矿", "", "&7通过GEO矿机在金合欢森林群系获得"
+    );
+    public static final SlimefunItemStack CANFIELDITE = new SlimefunItemStack(
+            "CANFIELDITE", Material.AMETHYST_SHARD, "&5黑硫银锡矿", "", "&7挖掘石头有概率获得"
+    );
+    public static final SlimefunItemStack MALAYAITE = new SlimefunItemStack(
+            "MALAYAITE", Material.WHITE_TERRACOTTA, "&f马来亚石", "", "&7通过GEO矿机在草原群系获得"
+    );
+    public static final SlimefunItemStack VARLAMOFFITE = new SlimefunItemStack(
+            "VARLAMOFFITE", Material.ORANGE_TERRACOTTA, "&6水锡石", "", "&7通过GEO矿机在末地获得"
+    );
 
     private static final ItemStack[] NULL_RECIPE = new ItemStack[] {
             null, null, null, null, null, null, null, null, null
@@ -97,6 +121,10 @@ public final class MoreOresItems {
 
     private static final ItemStack[] CALCITE_GRIND_RECIPE = new ItemStack[] {
             new ItemStack(Material.CALCITE), null, null, null, null, null, null, null, null
+    };
+
+    private static final ItemStack[] POLISHED_GRANITE_GRIND_RECIPE = new ItemStack[] {
+            new ItemStack(Material.POLISHED_GRANITE), null, null, null, null, null, null, null, null
     };
 
     private static int researchId = 9800;
@@ -132,6 +160,21 @@ public final class MoreOresItems {
         registerGeoOre(PYROMORPHITE, "pyromorphite", "磷氯铅矿", 3);
         registerGeoOre(MIMETITE, "mimetite", "砷铅矿", 3);
         registerGeoOre(BOURNONITE, "bournonite", "车轮矿", 3);
+
+        registerGrindOreCustom(CASSITERITE, "cassiterite", "锡石", 2, POLISHED_GRANITE_GRIND_RECIPE);
+
+        ItemStack galenaInput = GALENA.clone();
+        galenaInput.setAmount(2);
+        registerGrindOreCustom(TEALLITE, "teallite", "硫锡铅矿", 3,
+                new ItemStack[]{galenaInput, null, null, null, null, null, null, null, null});
+
+        registerDropOre(STANNITE, "stannite", "黄锡矿", 2);
+        registerDropOre(CANFIELDITE, "canfieldite", "黑硫银锡矿", 2);
+
+        registerGeoOre(FRANCKEITE, "franckeite", "辉锑锡铅矿", 3);
+        registerGeoOre(CYLINDRITE, "cylindrite", "圆柱锡矿", 3);
+        registerGeoOre(MALAYAITE, "malayaite", "马来亚石", 3);
+        registerGeoOre(VARLAMOFFITE, "varlamoffite", "水锡石", 3);
     }
 
     private static void registerDropOre(SlimefunItemStack item, String key, String name, int cost) {
@@ -143,7 +186,11 @@ public final class MoreOresItems {
     }
 
     private static void registerGrindOre(SlimefunItemStack item, String key, String name, int cost) {
-        new MoreOresItem(MORE_ORES, item, RecipeType.GRIND_STONE, CALCITE_GRIND_RECIPE)
+        registerGrindOreCustom(item, key, name, cost, CALCITE_GRIND_RECIPE);
+    }
+
+    private static void registerGrindOreCustom(SlimefunItemStack item, String key, String name, int cost, ItemStack[] recipe) {
+        new MoreOresItem(MORE_ORES, item, RecipeType.GRIND_STONE, recipe)
                 .setUseableInWorkbench(false)
                 .register(MoreOres.getInstance());
         new Research(new NamespacedKey(MoreOres.getInstance(), key), researchId++, name, cost)

@@ -36,6 +36,18 @@ public final class MoreOresResources {
             Biome.SNOWY_SLOPES, Biome.GROVE
     );
 
+    private static final Set<Biome> DESERT_BADLANDS_BIOMES = Set.of(
+            Biome.DESERT, Biome.BADLANDS, Biome.WOODED_BADLANDS, Biome.ERODED_BADLANDS
+    );
+
+    private static final Set<Biome> SAVANNA_BIOMES = Set.of(
+            Biome.SAVANNA, Biome.SAVANNA_PLATEAU, Biome.WINDSWEPT_SAVANNA
+    );
+
+    private static final Set<Biome> PLAINS_BIOMES = Set.of(
+            Biome.PLAINS, Biome.SUNFLOWER_PLAINS
+    );
+
     private MoreOresResources() {}
 
     public static void registerAll() {
@@ -45,6 +57,10 @@ public final class MoreOresResources {
         new PyromorphiteResource().register();
         new MimetiteResource().register();
         new BournoniteResource().register();
+        new FranckeiteResource().register();
+        new CylindriteResource().register();
+        new MalayaiteResource().register();
+        new VarlamoffiteResource().register();
     }
 
     static abstract class MoreOresGeoResource implements GEOResource {
@@ -266,6 +282,151 @@ public final class MoreOresResources {
         public int getMaxDeviation() {
             int max = MoreOres.getInstance().getConfig().getInt("geo_miner.bournonite.max", 5);
             int min = MoreOres.getInstance().getConfig().getInt("geo_miner.bournonite.min", 1);
+            return max - min;
+        }
+    }
+
+    static class FranckeiteResource extends MoreOresGeoResource {
+        private final NamespacedKey key = new NamespacedKey(MoreOres.getInstance(), "franckeite");
+
+        @Override
+        public NamespacedKey getKey() {
+            return key;
+        }
+
+        @Override
+        @Nonnull
+        public String getName() {
+            return "辉锑锡铅矿";
+        }
+
+        @Override
+        @Nonnull
+        public ItemStack getItem() {
+            return MoreOresItems.FRANCKEITE.clone();
+        }
+
+        @Override
+        public int getDefaultSupply(@Nonnull World.Environment environment, @Nonnull Biome biome) {
+            if (environment != World.Environment.NORMAL) return 0;
+            if (DESERT_BADLANDS_BIOMES.contains(biome)) {
+                return MoreOres.getInstance().getConfig().getInt("geo_miner.franckeite.min", 1);
+            }
+            return 0;
+        }
+
+        @Override
+        public int getMaxDeviation() {
+            int max = MoreOres.getInstance().getConfig().getInt("geo_miner.franckeite.max", 3);
+            int min = MoreOres.getInstance().getConfig().getInt("geo_miner.franckeite.min", 1);
+            return max - min;
+        }
+    }
+
+    static class CylindriteResource extends MoreOresGeoResource {
+        private final NamespacedKey key = new NamespacedKey(MoreOres.getInstance(), "cylindrite");
+
+        @Override
+        public NamespacedKey getKey() {
+            return key;
+        }
+
+        @Override
+        @Nonnull
+        public String getName() {
+            return "圆柱锡矿";
+        }
+
+        @Override
+        @Nonnull
+        public ItemStack getItem() {
+            return MoreOresItems.CYLINDRITE.clone();
+        }
+
+        @Override
+        public int getDefaultSupply(@Nonnull World.Environment environment, @Nonnull Biome biome) {
+            if (environment != World.Environment.NORMAL) return 0;
+            if (SAVANNA_BIOMES.contains(biome)) {
+                return MoreOres.getInstance().getConfig().getInt("geo_miner.cylindrite.min", 1);
+            }
+            return 0;
+        }
+
+        @Override
+        public int getMaxDeviation() {
+            int max = MoreOres.getInstance().getConfig().getInt("geo_miner.cylindrite.max", 3);
+            int min = MoreOres.getInstance().getConfig().getInt("geo_miner.cylindrite.min", 1);
+            return max - min;
+        }
+    }
+
+    static class MalayaiteResource extends MoreOresGeoResource {
+        private final NamespacedKey key = new NamespacedKey(MoreOres.getInstance(), "malayaite");
+
+        @Override
+        public NamespacedKey getKey() {
+            return key;
+        }
+
+        @Override
+        @Nonnull
+        public String getName() {
+            return "马来亚石";
+        }
+
+        @Override
+        @Nonnull
+        public ItemStack getItem() {
+            return MoreOresItems.MALAYAITE.clone();
+        }
+
+        @Override
+        public int getDefaultSupply(@Nonnull World.Environment environment, @Nonnull Biome biome) {
+            if (environment != World.Environment.NORMAL) return 0;
+            if (PLAINS_BIOMES.contains(biome)) {
+                return MoreOres.getInstance().getConfig().getInt("geo_miner.malayaite.min", 1);
+            }
+            return 0;
+        }
+
+        @Override
+        public int getMaxDeviation() {
+            int max = MoreOres.getInstance().getConfig().getInt("geo_miner.malayaite.max", 3);
+            int min = MoreOres.getInstance().getConfig().getInt("geo_miner.malayaite.min", 1);
+            return max - min;
+        }
+    }
+
+    static class VarlamoffiteResource extends MoreOresGeoResource {
+        private final NamespacedKey key = new NamespacedKey(MoreOres.getInstance(), "varlamoffite");
+
+        @Override
+        public NamespacedKey getKey() {
+            return key;
+        }
+
+        @Override
+        @Nonnull
+        public String getName() {
+            return "水锡石";
+        }
+
+        @Override
+        @Nonnull
+        public ItemStack getItem() {
+            return MoreOresItems.VARLAMOFFITE.clone();
+        }
+
+        @Override
+        public int getDefaultSupply(@Nonnull World.Environment environment, @Nonnull Biome biome) {
+            if (environment != World.Environment.THE_END) return 0;
+            return MoreOres.getInstance().getConfig().getInt("geo_miner.varlamoffite.min", 1);
+        }
+
+        @Override
+        public int getMaxDeviation() {
+            int max = MoreOres.getInstance().getConfig().getInt("geo_miner.varlamoffite.max", 3);
+            int min = MoreOres.getInstance().getConfig().getInt("geo_miner.varlamoffite.min", 1);
             return max - min;
         }
     }

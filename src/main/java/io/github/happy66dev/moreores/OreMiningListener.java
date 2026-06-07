@@ -34,6 +34,9 @@ public class OreMiningListener implements Listener {
     private static final Set<Material> DEEPSLATE_REDSTONE_TARGETS = Set.of(Material.DEEPSLATE_REDSTONE_ORE);
     private static final Set<Material> DIAMOND_ORE_TARGETS = Set.of(Material.DIAMOND_ORE, Material.DEEPSLATE_DIAMOND_ORE);
 
+    private static final Set<Material> GOLD_ORE_TARGETS = Set.of(Material.GOLD_ORE, Material.DEEPSLATE_GOLD_ORE);
+    private static final Set<Material> STONE_TARGETS = Set.of(Material.STONE);
+
     public OreMiningListener(MoreOres plugin) {
         this.plugin = plugin;
     }
@@ -149,6 +152,18 @@ public class OreMiningListener implements Listener {
         chance = plugin.getConfig().getDouble("ores.wulfenite.chance", 0.05);
         if (DIAMOND_ORE_TARGETS.contains(broken) && random.nextDouble() < chance) {
             dropOre(event, MoreOresItems.WULFENITE);
+            return;
+        }
+
+        chance = plugin.getConfig().getDouble("ores.stannite.chance", 0.10);
+        if (GOLD_ORE_TARGETS.contains(broken) && random.nextDouble() < chance) {
+            dropOre(event, MoreOresItems.STANNITE);
+            return;
+        }
+
+        chance = plugin.getConfig().getDouble("ores.canfieldite.chance", 0.03);
+        if (STONE_TARGETS.contains(broken) && random.nextDouble() < chance) {
+            dropOre(event, MoreOresItems.CANFIELDITE);
         }
     }
 
