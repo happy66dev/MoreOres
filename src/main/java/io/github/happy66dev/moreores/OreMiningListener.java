@@ -18,7 +18,7 @@ public class OreMiningListener implements Listener {
 
     private final MoreOres plugin;
 
-    private static final Set<Material> YELLOW_IRON_ORE_TARGETS = Set.of(Material.IRON_ORE, Material.COPPER_ORE);
+    private static final Set<Material> IRON_ORE_TARGETS = Set.of(Material.IRON_ORE, Material.COPPER_ORE);
     private static final Set<Material> BAUXITE_TARGETS = Set.of(Material.CLAY, Material.IRON_ORE, Material.COAL_ORE, Material.REDSTONE_ORE);
     private static final Set<Material> CORUNDUM_TARGETS = Set.of(Material.DEEPSLATE_EMERALD_ORE);
     private static final Set<Material> SPHALERITE_TARGETS = Set.of(Material.COPPER_ORE);
@@ -31,11 +31,10 @@ public class OreMiningListener implements Listener {
     private static final Set<Material> EMERALD_ORE_TARGETS = Set.of(Material.EMERALD_ORE, Material.DEEPSLATE_EMERALD_ORE);
     private static final Set<Material> DEEPSLATE_REDSTONE_TARGETS = Set.of(Material.DEEPSLATE_REDSTONE_ORE);
     private static final Set<Material> DIAMOND_ORE_TARGETS = Set.of(Material.DIAMOND_ORE, Material.DEEPSLATE_DIAMOND_ORE);
-
-    private static final Set<Material> GOLD_ORE_TARGETS = Set.of(Material.GOLD_ORE, Material.DEEPSLATE_GOLD_ORE);
     private static final Set<Material> STONE_TARGETS = Set.of(Material.STONE);
 
     private static final Set<Material> GOLD_ORE_ONLY = Set.of(Material.GOLD_ORE);
+    private static final Set<Material> GOLD_ORE_FULL = Set.of(Material.GOLD_ORE, Material.DEEPSLATE_GOLD_ORE);
     private static final Set<Material> NETHER_GOLD_ORE_TARGETS = Set.of(Material.NETHER_GOLD_ORE);
     private static final Set<Material> NETHER_QUARTZ_ORE_TARGETS = Set.of(Material.NETHER_QUARTZ_ORE);
     private static final Set<Material> DEEPSLATE_GOLD_ONLY = Set.of(Material.DEEPSLATE_GOLD_ORE);
@@ -54,155 +53,43 @@ public class OreMiningListener implements Listener {
 
         Material broken = event.getBlock().getType();
         ThreadLocalRandom random = ThreadLocalRandom.current();
-        double chance;
 
-        chance = plugin.getConfig().getDouble("ores.yellow_iron_ore.chance", 0.15);
-        if (YELLOW_IRON_ORE_TARGETS.contains(broken) && random.nextDouble() < chance) {
-            dropOre(event, MoreOresItems.YELLOW_IRON_ORE);
-            return;
-        }
+        rollAndDrop(event, random, broken, "ores.yellow_iron_ore.chance", 0.15, IRON_ORE_TARGETS, MoreOresItems.YELLOW_IRON_ORE);
+        rollAndDrop(event, random, broken, "ores.bauxite.chance", 0.10, BAUXITE_TARGETS, MoreOresItems.BAUXITE);
+        rollAndDrop(event, random, broken, "ores.blue_corundum.chance", 0.0001, CORUNDUM_TARGETS, MoreOresItems.BLUE_CORUNDUM);
+        rollAndDrop(event, random, broken, "ores.red_corundum.chance", 0.0001, CORUNDUM_TARGETS, MoreOresItems.RED_CORUNDUM);
+        rollAndDrop(event, random, broken, "ores.sphalerite.chance", 0.10, SPHALERITE_TARGETS, MoreOresItems.SPHALERITE);
+        rollAndDrop(event, random, broken, "ores.stacked_zinc_ore.chance", 0.20, ZINC_ORE_TARGETS, MoreOresItems.STACKED_ZINC_ORE);
+        rollAndDrop(event, random, broken, "ores.smithsonite.chance", 0.10, ZINC_ORE_TARGETS, MoreOresItems.SMITHSONITE);
+        rollAndDrop(event, random, broken, "ores.magnesium_zinc_ore.chance", 0.01, STONE_TARGETS, MoreOresItems.MAGNESIUM_ZINC_ORE);
+        rollAndDrop(event, random, broken, "ores.red_zincite.chance", 0.10, RED_ZINCITE_TARGETS, MoreOresItems.RED_ZINCITE);
 
-        chance = plugin.getConfig().getDouble("ores.bauxite.chance", 0.10);
-        if (BAUXITE_TARGETS.contains(broken) && random.nextDouble() < chance) {
-            dropOre(event, MoreOresItems.BAUXITE);
-            return;
-        }
+        rollAndDrop(event, random, broken, "ores.galena.chance", 0.08, COPPER_ORE_TARGETS, MoreOresItems.GALENA);
+        rollAndDrop(event, random, broken, "ores.cerussite.chance", 0.04, COPPER_ORE_TARGETS, MoreOresItems.CERUSSITE);
+        rollAndDrop(event, random, broken, "ores.anglesite.chance", 0.02, COPPER_ORE_TARGETS, MoreOresItems.ANGLESITE);
+        rollAndDrop(event, random, broken, "ores.crocoite.chance", 0.03, DEEPSLATE_IRON_TARGETS, MoreOresItems.CROCOITE);
+        rollAndDrop(event, random, broken, "ores.boulangerite.chance", 0.02, LAPIS_ORE_TARGETS, MoreOresItems.BOULANGERITE);
+        rollAndDrop(event, random, broken, "ores.jamesonite.chance", 0.10, EMERALD_ORE_TARGETS, MoreOresItems.JAMESONITE);
+        rollAndDrop(event, random, broken, "ores.vanadinite.chance", 0.05, DEEPSLATE_REDSTONE_TARGETS, MoreOresItems.VANADINITE);
+        rollAndDrop(event, random, broken, "ores.wulfenite.chance", 0.05, DIAMOND_ORE_TARGETS, MoreOresItems.WULFENITE);
 
-        chance = plugin.getConfig().getDouble("ores.blue_corundum.chance", 0.0001);
-        if (CORUNDUM_TARGETS.contains(broken) && random.nextDouble() < chance) {
-            dropOre(event, MoreOresItems.BLUE_CORUNDUM);
-            return;
-        }
+        rollAndDrop(event, random, broken, "ores.stannite.chance", 0.10, GOLD_ORE_FULL, MoreOresItems.STANNITE);
+        rollAndDrop(event, random, broken, "ores.canfieldite.chance", 0.03, STONE_TARGETS, MoreOresItems.CANFIELDITE);
+        rollAndDrop(event, random, broken, "ores.electrum.chance", 0.05, GOLD_ORE_ONLY, MoreOresItems.ELECTRUM);
 
-        chance = plugin.getConfig().getDouble("ores.red_corundum.chance", 0.0001);
-        if (CORUNDUM_TARGETS.contains(broken) && random.nextDouble() < chance) {
-            dropOre(event, MoreOresItems.RED_CORUNDUM);
-            return;
-        }
+        rollAndDrop(event, random, broken, "ores.pyrargyrite.chance", 0.10, NETHER_GOLD_ORE_TARGETS, MoreOresItems.PYRARGYRITE);
+        rollAndDrop(event, random, broken, "ores.proustite.chance", 0.10, NETHER_QUARTZ_ORE_TARGETS, MoreOresItems.PROUSTITE);
+        rollAndDrop(event, random, broken, "ores.stephanite.chance", 0.05, NETHER_QUARTZ_ORE_TARGETS, MoreOresItems.STEPHANITE);
+        rollAndDrop(event, random, broken, "ores.dyscrasite.chance", 0.05, NETHER_GOLD_ORE_TARGETS, MoreOresItems.DYSKRASITE);
+        rollAndDrop(event, random, broken, "ores.hessite.chance", 0.05, DEEPSLATE_GOLD_ONLY, MoreOresItems.HESSITE);
+    }
 
-        chance = plugin.getConfig().getDouble("ores.sphalerite.chance", 0.10);
-        if (SPHALERITE_TARGETS.contains(broken) && random.nextDouble() < chance) {
-            dropOre(event, MoreOresItems.SPHALERITE);
-            return;
-        }
-
-        chance = plugin.getConfig().getDouble("ores.stacked_zinc_ore.chance", 0.20);
-        if (ZINC_ORE_TARGETS.contains(broken) && random.nextDouble() < chance) {
-            dropOre(event, MoreOresItems.STACKED_ZINC_ORE);
-            return;
-        }
-
-        chance = plugin.getConfig().getDouble("ores.smithsonite.chance", 0.10);
-        if (ZINC_ORE_TARGETS.contains(broken) && random.nextDouble() < chance) {
-            dropOre(event, MoreOresItems.SMITHSONITE);
-            return;
-        }
-
-        chance = plugin.getConfig().getDouble("ores.magnesium_zinc_ore.chance", 0.01);
-        if (STONE_TARGETS.contains(broken) && random.nextDouble() < chance) {
-            dropOre(event, MoreOresItems.MAGNESIUM_ZINC_ORE);
-            return;
-        }
-
-        chance = plugin.getConfig().getDouble("ores.red_zincite.chance", 0.10);
-        if (RED_ZINCITE_TARGETS.contains(broken) && random.nextDouble() < chance) {
-            dropOre(event, MoreOresItems.RED_ZINCITE);
-            return;
-        }
-
-        chance = plugin.getConfig().getDouble("ores.galena.chance", 0.08);
-        if (COPPER_ORE_TARGETS.contains(broken) && random.nextDouble() < chance) {
-            dropOre(event, MoreOresItems.GALENA);
-            return;
-        }
-
-        chance = plugin.getConfig().getDouble("ores.cerussite.chance", 0.04);
-        if (COPPER_ORE_TARGETS.contains(broken) && random.nextDouble() < chance) {
-            dropOre(event, MoreOresItems.CERUSSITE);
-            return;
-        }
-
-        chance = plugin.getConfig().getDouble("ores.anglesite.chance", 0.02);
-        if (COPPER_ORE_TARGETS.contains(broken) && random.nextDouble() < chance) {
-            dropOre(event, MoreOresItems.ANGLESITE);
-            return;
-        }
-
-        chance = plugin.getConfig().getDouble("ores.crocoite.chance", 0.03);
-        if (DEEPSLATE_IRON_TARGETS.contains(broken) && random.nextDouble() < chance) {
-            dropOre(event, MoreOresItems.CROCOITE);
-            return;
-        }
-
-        chance = plugin.getConfig().getDouble("ores.boulangerite.chance", 0.02);
-        if (LAPIS_ORE_TARGETS.contains(broken) && random.nextDouble() < chance) {
-            dropOre(event, MoreOresItems.BOULANGERITE);
-            return;
-        }
-
-        chance = plugin.getConfig().getDouble("ores.jamesonite.chance", 0.10);
-        if (EMERALD_ORE_TARGETS.contains(broken) && random.nextDouble() < chance) {
-            dropOre(event, MoreOresItems.JAMESONITE);
-            return;
-        }
-
-        chance = plugin.getConfig().getDouble("ores.vanadinite.chance", 0.05);
-        if (DEEPSLATE_REDSTONE_TARGETS.contains(broken) && random.nextDouble() < chance) {
-            dropOre(event, MoreOresItems.VANADINITE);
-            return;
-        }
-
-        chance = plugin.getConfig().getDouble("ores.wulfenite.chance", 0.05);
-        if (DIAMOND_ORE_TARGETS.contains(broken) && random.nextDouble() < chance) {
-            dropOre(event, MoreOresItems.WULFENITE);
-            return;
-        }
-
-        chance = plugin.getConfig().getDouble("ores.stannite.chance", 0.10);
-        if (GOLD_ORE_TARGETS.contains(broken) && random.nextDouble() < chance) {
-            dropOre(event, MoreOresItems.STANNITE);
-            return;
-        }
-
-        chance = plugin.getConfig().getDouble("ores.canfieldite.chance", 0.03);
-        if (STONE_TARGETS.contains(broken) && random.nextDouble() < chance) {
-            dropOre(event, MoreOresItems.CANFIELDITE);
-            return;
-        }
-
-        chance = plugin.getConfig().getDouble("ores.electrum.chance", 0.05);
-        if (GOLD_ORE_ONLY.contains(broken) && random.nextDouble() < chance) {
-            dropOre(event, MoreOresItems.ELECTRUM);
-            return;
-        }
-
-        chance = plugin.getConfig().getDouble("ores.pyrargyrite.chance", 0.10);
-        if (NETHER_GOLD_ORE_TARGETS.contains(broken) && random.nextDouble() < chance) {
-            dropOre(event, MoreOresItems.PYRARGYRITE);
-            return;
-        }
-
-        chance = plugin.getConfig().getDouble("ores.proustite.chance", 0.10);
-        if (NETHER_QUARTZ_ORE_TARGETS.contains(broken) && random.nextDouble() < chance) {
-            dropOre(event, MoreOresItems.PROUSTITE);
-            return;
-        }
-
-        chance = plugin.getConfig().getDouble("ores.stephanite.chance", 0.05);
-        if (NETHER_QUARTZ_ORE_TARGETS.contains(broken) && random.nextDouble() < chance) {
-            dropOre(event, MoreOresItems.STEPHANITE);
-            return;
-        }
-
-        chance = plugin.getConfig().getDouble("ores.dyscrasite.chance", 0.05);
-        if (NETHER_GOLD_ORE_TARGETS.contains(broken) && random.nextDouble() < chance) {
-            dropOre(event, MoreOresItems.DYSKRASITE);
-            return;
-        }
-
-        chance = plugin.getConfig().getDouble("ores.hessite.chance", 0.05);
-        if (DEEPSLATE_GOLD_ONLY.contains(broken) && random.nextDouble() < chance) {
-            dropOre(event, MoreOresItems.HESSITE);
+    private void rollAndDrop(BlockBreakEvent event, ThreadLocalRandom random, Material broken,
+                             String configKey, double defaultChance, Set<Material> targets, SlimefunItemStack ore) {
+        if (!targets.contains(broken)) return;
+        double chance = plugin.getConfig().getDouble(configKey, defaultChance);
+        if (random.nextDouble() < chance) {
+            dropOre(event, ore);
         }
     }
 

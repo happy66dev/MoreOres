@@ -268,8 +268,6 @@ public final class MoreOresItems {
                 .addItems(item).register();
     }
 
-
-
     private static void registerGeoOre(SlimefunItemStack item, String key, String name, int cost) {
         new MoreOresItem(MORE_ORES, item, RecipeType.GEO_MINER, NULL_RECIPE)
                 .setUseableInWorkbench(false)

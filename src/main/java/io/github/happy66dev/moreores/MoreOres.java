@@ -31,7 +31,7 @@ public class MoreOres extends JavaPlugin implements SlimefunAddon {
                         SlimefunItems.HEATING_COIL,     SlimefunItems.ELECTRIC_FURNACE, SlimefunItems.HEATING_COIL,
                         new ItemStack(Material.CHEST),  SlimefunItems.STEEL_PLATE,      new ItemStack(Material.CHEST)
                 });
-        machine.setCapacity(256).setEnergyConsumption(15).setProcessingSpeed(1);
+        machine.setCapacity(256).setEnergyConsumption(2).setProcessingSpeed(1);
         machine.registerRecipes();
         machine.register(this);
         new Research(new NamespacedKey(this, "heated_reaction_chamber"), 9950, "普通加热反应室", 5)

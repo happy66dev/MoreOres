@@ -10,11 +10,9 @@ import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Arrays;
-
 public class HeatedReactionChamber extends AContainer {
 
-    private static final int[] BORDER_SLOTS = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 13, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26};
+    private static final int[] BORDER_SLOTS = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26};
     private static final int[] INPUT_SLOTS = {10, 11, 12};
     private static final int[] OUTPUT_SLOTS = {14, 15, 16};
     private static final int PROGRESS_SLOT = 13;
@@ -56,10 +54,7 @@ public class HeatedReactionChamber extends AContainer {
                 (p, s, item, action) -> false);
 
         for (int slot : OUTPUT_SLOTS) {
-            preset.addMenuClickHandler(slot, (p, s, item, action) -> {
-                if (item == null || item.getType().isAir()) return false;
-                return !action.isShiftClicked();
-            });
+            preset.addMenuClickHandler(slot, (p, s, item, action) -> false);
         }
     }
 
