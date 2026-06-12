@@ -2,7 +2,7 @@
 
 > 粘液科技附属插件 — 区块矿脉系统 + 矿机 + 仓库 + 扫描器 + 钻头
 >
-> 日期: 2026-06-12 | 版本: 1.0-draft
+> 日期: 2026-06-12 | 版本: 1.0-final
 
 ---
 
@@ -17,7 +17,8 @@
 | **岩上空间** | 基岩以上的部分（不含太空），即 Y ≥ world.getMinHeight() 以上 |
 | **岩下空间** | 基岩以下的部分，即 Y < world.getMinHeight()（通常 Y < -64） |
 | **矿脉** | 区块中蕴含的矿物总量，以数量表示 |
-| **矿区** | 矿量较高的区块（矿脉等级 ≥ 中），4096个区块中约128个 |
+| **矿区** | 矿量较高的区块，4096个区块中约128个 |
+| **矿物种类** | 由区块所在群系决定，详见 biome-ore-mapping.md |
 
 ---
 
@@ -89,11 +90,11 @@ int deepVein = veinSize - surfaceVein;
 | 高 (H) | 40 | 常见矿物 |
 | 中 (M) | 20 | 较常见至较稀有 |
 | 低 (L) | 5 | 稀有至极稀有 |
+| V | — | MC原版物品（石英/萤石），非MoreOres矿物 |
 
-区块产出时，从群系矿物池中按权重随机选取 1~3 种矿物。高权重矿物被选中概率更高。
+**所有区块（有矿脉/无矿脉）都使用相同的群系矿物池**，区别仅在于矿量大小。区块产出时，从群系矿物池中按权重随机选取 1~3 种矿物。
 
 ```java
-// 加权随机选取
 private SlimefunItemStack pickWeightedOre(List<WeightedOre> pool, Random rng) {
     int totalWeight = pool.stream().mapToInt(o -> o.rarity.weight).sum();
     int roll = rng.nextInt(totalWeight);
@@ -104,7 +105,7 @@ private SlimefunItemStack pickWeightedOre(List<WeightedOre> pool, Random rng) {
     return pool.get(pool.size() - 1).fallback;
 }
 
-int mineralCount = 1 + rng.nextInt(3); // 1~3种
+int mineralCount = 1 + rng.nextInt(3);
 List<SlimefunItemStack> minerals = pickMultipleWeighted(pool, mineralCount, rng);
 ```
 
@@ -112,28 +113,31 @@ List<SlimefunItemStack> minerals = pickMultipleWeighted(pool, mineralCount, rng)
 
 ### 2.6 数据存储
 
-矿量数据存储在自定义数据文件中（不修改原版世界数据）：
+矿量数据**无需文件持久化**，直接通过种子实时计算（确定性算法保证一致性）：
 
-**文件路径**: `plugins/MoreOres/vein_data/<worldName>.dat`
+```java
+// 首次查询时计算，缓存到内存Map中
+// 无需写入磁盘，重启后自动重新计算
+private final Map<Long, ChunkVeinData> cache = new ConcurrentHashMap<>();
 
-**存储格式**: 每条记录包含：
+public ChunkVeinData getVeinData(World world, int chunkX, int chunkZ) {
+    long key = chunkKey(world, chunkX, chunkZ);
+    return cache.computeIfAbsent(key, k -> calculateVeinData(world, chunkX, chunkZ));
+}
 ```
-chunkX (int) | chunkZ (int) | veinSize (int) | isMiningZone (boolean) | minerals (String[])
-```
-
-**加载策略**: 懒加载 — 首次查询某区块时计算并缓存，后续从内存读取
 
 ### 2.7 数据类
 
 ```java
 public class ChunkVeinData {
-    int chunkX;
-    int chunkZ;
-    int totalVeinSize;       // 总矿量
-    int remainingVeinSize;   // 剩余矿量（开采后减少）
-    boolean isMiningZone;    // 是否矿区
-    String[] mineralIds;     // 1~3种矿物ID
-    double surfaceRatio;     // 岩上空间占比
+    final int chunkX;
+    final int chunkZ;
+    final int totalVeinSize;
+    volatile int remainingVeinSize;
+    final boolean isMiningZone;
+    final String[] mineralIds;
+    final double surfaceRatio;
+    final Biome biome;
 }
 ```
 
@@ -149,11 +153,11 @@ public class ChunkVeinData {
 | 显示名 | &b矿脉扫描器 |
 | 材质 | COMPASS |
 | 合成台 | ENHANCED_CRAFTING_TABLE |
-| 使用方式 | 右键使用，扫描后不消耗（可重复使用） |
+| 使用方式 | 右键使用，不消耗（可重复使用） |
 
 ### 3.2 扫描信息
 
-右键使用后，打开UI界面显示以下信息：
+右键使用后，打开UI界面（ChestMenu 3行27格）显示以下信息：
 
 | 信息 | 说明 |
 |------|------|
@@ -178,7 +182,25 @@ private String estimateAmount(int amount) {
 }
 ```
 
-### 3.4 合成配方 (3×3)
+### 3.4 扫描器UI布局
+
+```
+行1: 灰 灰 灰 灰 灰 灰 灰 灰 灰
+行2: 灰 ① ② ③ ④ ⑤ ⑥ ⑦ 灰
+行3: 灰 灰 灰 灰 灰 灰 灰 灰 灰
+```
+
+| 槽位 | 内容 |
+|------|------|
+| ① 当前区块矿脉等级 | 小/中/大/超大/空 |
+| ② 总矿量估算 | "约 X,XXX" |
+| ③ 岩上空间矿量 | "约 XXX" |
+| ④ 矿物种类1 | 矿物代表物品 |
+| ⑤ 矿物种类2 | 矿物代表物品 |
+| ⑥ 矿物种类3 | 矿物代表物品 |
+| ⑦ 附近矿区数 | "32格内X个矿区" |
+
+### 3.5 合成配方 (3×3)
 
 ```
 铁锭    红石    铁锭
@@ -196,7 +218,7 @@ private String estimateAmount(int amount) {
 |------|-----|
 | ID | `CHUNK_MINER` |
 | 显示名 | &6矿机 |
-| 材质 | NETHERITE_PICKAXE (head texture) 或 BLAST_FURNACE |
+| 材质 | BLAST_FURNACE |
 | 合成台 | ENHANCED_CRAFTING_TABLE |
 | 基类 | AContainer (Slimefun电力机器) |
 | UI | 3行27格，3输入+3输出 |
@@ -204,10 +226,11 @@ private String estimateAmount(int amount) {
 ### 4.2 工作机制
 
 1. 矿机放置在某个区块内
-2. 获取当前区块的 `ChunkVeinData`（有矿脉的区块矿量大，无矿脉的区块矿量小，但矿物种类由群系决定）
+2. 获取当前区块的 `ChunkVeinData`
 3. **所有区块都能通过矿机获取矿物**：
    - 有矿脉区块：矿量大（300~50,000+），产出丰富
-   - 无矿脉区块：矿量小（0~300），产出稀少，但矿物种类相同
+   - 无矿脉区块：矿量小（0~300），产出稀少
+   - **矿物种类由群系决定，两种区块一致**
 4. 根据以下公式计算每周期产出速率：
 
 ```
@@ -218,7 +241,7 @@ private String estimateAmount(int amount) {
 |------|------|--------|
 | 基础速率 | 每个处理周期(10s)产出1个矿物 | 1 |
 | 深度系数 | 矿机放置的Y坐标越低，系数越高 | 1.0 ~ 3.0 |
-| 钻头系数 | 由安装的钻头等级决定 | 1.0 ~ 5.0（预留） |
+| 钻头系数 | 由安装的钻头等级决定 | 1.0 ~ N（预留） |
 
 ### 4.3 深度系数计算
 
@@ -239,6 +262,8 @@ if (minerY < -64) depthFactor = 3.0;
 |------|-----|
 | 基础耗电 | 20 J/s (10 J/tick) |
 
+**仅消耗电力，不需要额外燃料。**
+
 ### 4.5 采矿损耗
 
 开采有损耗，并非矿有多少就能挖多少：
@@ -247,18 +272,18 @@ if (minerY < -64) depthFactor = 3.0;
 
 ### 4.6 岩上/岩下空间产出
 
-矿机在岩上空间和岩下空间都能开采矿物，但岩上空间占比受限：
+矿机在岩上空间和岩下空间都能开采矿物：
 
 - 有矿脉区块：岩上空间产出约占 15%
 - 无矿脉区块：岩上空间产出约占 20%
 
-岩下空间（Y < world.getMinHeight()）需要高级钻头才能开采，但产出更丰富（深度系数更高）。
+岩下空间（Y < world.getMinHeight()）需要**高级钻头**才能开采（按等级解锁），但产出更丰富（深度系数更高）。
 
 ### 4.7 剩余矿量耗尽
 
 当区块的 `remainingVeinSize ≤ 0` 时，矿机停止工作并显示"矿脉已耗尽"。
 
-### 4.7 UI 槽位
+### 4.8 UI 槽位
 
 ```
 行1: 灰 灰 灰 灰 灰 灰 灰 灰 灰
@@ -276,7 +301,7 @@ if (minerY < -64) depthFactor = 3.0;
 - 兼容粘液科技货运系统（CargoNet）
 - 输出槽的物品可被漏斗/货运自动取出
 
-### 4.9 合成配方 (3×3)
+### 4.10 合成配方 (3×3)
 
 ```
 铁镐      钻石      铁镐
@@ -319,30 +344,34 @@ if (minerY < -64) depthFactor = 3.0;
 
 | 槽位 | 说明 |
 |------|------|
-| ① 箱子配件槽 | 放入原版箱子，增加存储容量 |
-| ② 矿物显示槽 | 显示已存储的矿物代表物品 |
-| 箭 | 特殊槽位，显示已用容量/总容量 |
-| 红 | 上一页按钮 |
-| 绿 | 下一页按钮 |
+| ① 箱子配件槽 (9-14) | 放入原版箱子，增加存储容量 |
+| ② 矿物显示槽 (18-44) | 显示已存储的矿物代表物品（27格/页） |
+| 箭 (17) | 特殊槽位，显示 已用容量/总容量 |
+| 红 (45) | 上一页按钮 |
+| 绿 (53) | 下一页按钮 |
 
 ### 5.4 矿物交互
 
 | 操作 | 效果 |
 |------|------|
-| 点击 | 显示该矿物的存储数量 |
+| 点击 | 显示该矿物的存储数量（聊天消息） |
 | 左键/右键 | 获得1个存储的矿物 |
 | 丢出 | 获得1组存储的矿物（若不满一组则获得全部数量） |
 
 ### 5.5 翻页功能
 
-当存储的矿物种类超过单页显示容量时，可通过红/绿按钮翻页浏览。
+当存储的矿物种类超过单页显示容量（27种）时，可通过红/绿按钮翻页浏览。
 
-### 5.6 货运兼容
+### 5.6 内部存储
+
+仓库内部使用 `Map<String, Integer>` 存储矿物数据（矿物ID → 数量），不依赖外部容器。
+
+### 5.7 货运兼容
 
 - 兼容原版漏斗（Hopper）
 - 兼容粘液科技货运系统（CargoNet）
 
-### 5.7 合成配方 (3×3)
+### 5.8 合成配方 (3×3)
 
 ```
 箱子      铁锭      箱子
@@ -373,18 +402,18 @@ if (minerY < -64) depthFactor = 3.0;
 |------|-------------|
 | 产出速率 | 更高等级 = 更高钻头系数 |
 | 耗电量 | 更高等级 = 更高耗电 |
-| 采集深度 | 更高等级 = 可挖掘更深的矿脉（预留） |
-| 岩下空间 | 高等级钻头可钻穿基岩（预留） |
+| 采集深度 | 更高等级 = 可挖掘更深的矿脉 |
+| 岩下空间 | 高等级钻头可钻穿基岩（按等级解锁） |
 
-### 6.5 框架预留
+### 6.4 框架预留
 
 ```java
 public interface DrillBitProvider {
-    int getTier();                    // 钻头等级
-    double getSpeedMultiplier();      // 速度系数
-    double getEnergyMultiplier();     // 耗电系数
-    int getMaxDepth();                // 最大挖掘深度
-    boolean canMineBedrock();         // 是否可钻穿基岩
+    int getTier();
+    double getSpeedMultiplier();
+    double getEnergyMultiplier();
+    int getMaxDepth();
+    boolean canMineBedrock();
 }
 ```
 
@@ -431,7 +460,7 @@ public interface DrillBitProvider {
     ↓
 MineVeinManager.getVeinData(chunkX, chunkZ)
     ↓
-ChunkVeinData { totalVeinSize, remainingVeinSize, minerals[], ... }
+ChunkVeinData { totalVeinSize, remainingVeinSize, minerals[], biome, ... }
     ↓
 ChunkMiner 根据 深度×钻头 计算产出速率
     ↓
@@ -453,9 +482,11 @@ ChunkMiner 根据 深度×钻头 计算产出速率
 |------|------|------|
 | 新建 | `MineVeinManager.java` | 区块矿量系统核心 |
 | 新建 | `ChunkVeinData.java` | 区块矿量数据类 |
+| 新建 | `BiomeOreRegistry.java` | 群系-矿物-权重映射注册 |
 | 新建 | `VeinScanner.java` | 矿脉扫描器 |
 | 新建 | `ChunkMiner.java` | 矿机 (extends AContainer) |
 | 新建 | `OreWarehouse.java` | 矿产仓库 |
+| 新建 | `OreWarehouseMenu.java` | 仓库UI管理 |
 | 新建 | `DrillBit.java` | 钻头系统（预留框架） |
 | 新建 | `DrillProbe.java` | 钻头矿物探测器 |
 | 修改 | `MoreOresItems.java` | 新增物品常量 + 注册 |
@@ -470,22 +501,15 @@ ChunkMiner 根据 深度×钻头 计算产出速率
 
 ```yaml
 mine_vein:
-  # 矿区概率 (128/4096)
   mining_zone_chance: 0.03125
-  # 岩上空间占比
   surface_ratio_mining_zone: 0.15
   surface_ratio_normal: 0.20
-  # 采集损耗系数
   mining_loss_factor: 1.2
-  # 扫描器范围（格）
   scanner_range: 32
 
 chunk_miner:
-  # 基础耗电 (J/tick)
   base_energy_consumption: 10
-  # 基础处理周期（秒）
   base_processing_time: 10
-  # 基础产出量
   base_output_amount: 1
 ```
 
@@ -494,88 +518,25 @@ chunk_miner:
 ## 11. 设计决策记录
 
 1. **矿量确定性** — 用区块坐标+世界种子做随机种子，保证同一区块每次查询结果一致
-2. **懒加载** — 首次查询时计算并缓存，避免启动时遍历所有区块
+2. **无需持久化** — 种子算法确定性，重启后自动重新计算，内存缓存即可
 3. **矿脉耗尽** — remainingVeinSize 递减，耗尽后矿机停止
 4. **钻头预留** — 具体等级数量待定，但接口框架先定义好
 5. **货运兼容** — 使用标准 Bukkit Inventory 接口，天然兼容漏斗和粘液货运
 6. **损耗机制** — 1.2倍损耗系数，避免玩家无限制获取矿物
 7. **卫星跳过** — 涉及外部addon依赖，暂不实现
-8. **矿物种类群系决定** — 每个群系有固定矿物池，而非全局随机，增加真实感
-9. **三级稀有度权重** — 高(40)、中(20)、低(5)，加权随机选取，常见矿物概率更高
+8. **矿物种类群系决定** — 每个群系有固定矿物池，而非全局随机
+9. **三级稀有度权重** — 高(40)、中(20)、低(5)，加权随机选取
+10. **所有区块可开采** — 有矿脉/无矿脉区块都可用矿机，区别仅在矿量大小
+11. **钻头等级解锁岩下** — 按等级限制可开采深度
+12. **仅电力驱动** — 矿机不需要额外燃料
 
 ---
 
 ## 12. Notes
 
 - 本系统不依赖任何外部addon，全部在 MoreOres 内部实现
-- 矿量数据文件存储在 `plugins/MoreOres/vein_data/` 目录下，按世界名分文件
-- 钻头等级数量待定，但接口框架（DrillBitProvider）在 v0.1 中先定义好，后续只需新增实现类
-- 矿机的 AContainer 基类天然兼容漏斗和粘液货运，无需额外代码
+- 矿机的 AContainer 基类天然兼容漏斗和粘液货运
 - 扫描器是 SlimefunItem（NotPlaceable），右键使用触发 PlayerInteractEvent
 - 矿产仓库使用 Slimefun 的 BlockMenu 系统实现自定义容器UI
-- 损耗系数（1.2）和矿区概率（3.125%）均可通过 config.yml 自定义
-
----
-
-## 13. v0.1 框架架构图
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                      MoreOres v0.1.0                        │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  ┌──────────────────────────────────────────────────────┐   │
-│  │              MineVeinManager (核心)                   │   │
-│  │  - getVeinData(chunkX, chunkZ) → ChunkVeinData       │   │
-│  │  - 基于种子的确定性矿量计算                            │   │
-│  │  - 懒加载 + 内存缓存                                   │   │
-│  │  - 文件持久化 (vein_data/<world>.dat)                  │   │
-│  └──────────────────────┬───────────────────────────────┘   │
-│                         │                                   │
-│          ┌──────────────┼──────────────┐                    │
-│          │              │              │                    │
-│  ┌───────▼───────┐ ┌────▼────┐ ┌──────▼──────┐             │
-│  │  VeinScanner  │ │ChunkMiner│ │ OreWarehouse│             │
-│  │  矿脉扫描器   │ │  矿机    │ │  矿产仓库   │             │
-│  │               │ │         │ │             │             │
-│  │ 右键使用      │ │ AContainer│ │ BlockMenu  │             │
-│  │ 扫描32格内   │ │         │ │ 大容量存储  │             │
-│  │ 矿区/矿种    │ │ 3入3出   │ │ 兼容漏斗    │             │
-│  │ 数量估算      │ │ 动态耗电 │ │ 兼容货运    │             │
-│  └───────────────┘ │         │ └─────────────┘             │
-│                    │ ┌───────┤                              │
-│                    │ │配件槽 │                              │
-│                    │ └───┬───┘                              │
-│                    └─────┼──────────────────────────────────┘
-│                          │                                  │
-│              ┌───────────┴───────────┐                      │
-│              │                       │                      │
-│      ┌───────▼───────┐     ┌─────────▼─────────┐           │
-│      │   DrillBit    │     │   DrillProbe      │           │
-│      │   钻头(配件)  │     │ 钻头矿物探测器    │           │
-│      │               │     │ (配件)            │           │
-│      │ 速度/耗电系数 │     │ 精确矿脉大小      │           │
-│      │ 深度限制      │     │ 矿脉高度范围      │           │
-│      │ 等级框架预留  │     │ 当前开采深度      │           │
-│      └───────────────┘     └───────────────────┘           │
-│                                                             │
-├─────────────────────────────────────────────────────────────┤
-│  数据流:                                                    │
-│                                                             │
-│  区块坐标 ──→ MineVeinManager ──→ ChunkVeinData            │
-│                                    │                        │
-│  VeinScanner ──读取──→ ChunkVeinData ──→ 聊天消息          │
-│                                                             │
-│  ChunkMiner ──读取──→ ChunkVeinData                        │
-│       │                                                     │
-│       ├── 有矿脉区块: 矿量大,产出丰富                      │
-│       ├── 无矿脉区块: 矿量小,产出稀少(矿物种类相同)       │
-│       ├── 深度系数 × 钻头系数 → 产出速率                   │
-│       ├── remainingVeinSize -= 产出量 × 1.2（损耗）        │
-│       └── 输出矿物到输出槽                                  │
-│            │                                                │
-│            └──→ 漏斗/货运 ──→ OreWarehouse                 │
-│                                                             │
-│  DrillProbe ──安装在矿机输入槽──→ 显示矿脉详情             │
-└─────────────────────────────────────────────────────────────┘
-```
+- 所有配置项均可通过 config.yml 自定义
+- 群系-矿物映射表见 biome-ore-mapping.md
