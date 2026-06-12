@@ -147,6 +147,13 @@ public final class MoreOresItems {
     public static final SlimefunItemStack FREIESLEBENITE = new SlimefunItemStack(
             "FREIESLEBENITE", Material.BLACK_WOOL, "&8锌锑方辉银矿", "", "&7通过磨石研磨2个闪锌矿获得", "&7或通过磨石研磨16个磨制玄武岩获得"
     );
+    public static final SlimefunItemStack PYRITE_DUST = new SlimefunItemStack(
+            "PYRITE_DUST", Material.GLOWSTONE_DUST, "&f黄铁矿粉", "", "&7通过矿石粉碎机粉碎黄铁矿石获得"
+    );
+    public static final SlimefunItemStack HEATED_REACTION_CHAMBER_ITEM = new SlimefunItemStack(
+            "HEATED_REACTION_CHAMBER", Material.BLAST_FURNACE, "&c普通加热反应室", "",
+            "&8⇨ &e⚡ &730 J/s", "&7可在内部进行加热化学反应"
+    );
 
     private static final ItemStack[] NULL_RECIPE = new ItemStack[] {
             null, null, null, null, null, null, null, null, null
@@ -243,6 +250,14 @@ public final class MoreOresItems {
         registerGeoOre(ARGENTITE, "argentite", "辉银矿", 3);
         registerGeoOre(CERARGYRITE, "cerargyrite", "角银矿", 3);
         registerGeoOre(NAUMANNITE, "naumannite", "硒银矿", 3);
+
+        new MoreOresItem(MORE_ORES, PYRITE_DUST, RecipeType.ORE_CRUSHER,
+                new ItemStack[]{YELLOW_IRON_ORE, null, null, null, null, null, null, null, null},
+                new SlimefunItemStack(PYRITE_DUST, 2))
+                .setUseableInWorkbench(false)
+                .register(MoreOres.getInstance());
+        new Research(new NamespacedKey(MoreOres.getInstance(), "pyrite_dust"), researchId++, "黄铁矿粉", 2)
+                .addItems(PYRITE_DUST).register();
     }
 
     private static void registerDropOre(SlimefunItemStack item, String key, String name, int cost) {
@@ -266,6 +281,10 @@ public final class MoreOresItems {
     static class MoreOresItem extends SlimefunItem implements NotPlaceable {
         MoreOresItem(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
             super(itemGroup, item, recipeType, recipe);
+        }
+
+        MoreOresItem(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe, ItemStack recipeOutput) {
+            super(itemGroup, item, recipeType, recipe, recipeOutput);
         }
     }
 }

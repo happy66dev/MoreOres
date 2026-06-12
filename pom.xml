@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.github.happy66dev</groupId>
     <artifactId>MoreOres</artifactId>
-    <version>v0.0.4Alpha</version>
+    <version>v0.0.5Alpha</version>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -90,8 +90,9 @@
         <dependency>
             <groupId>com.github.happy66dev</groupId>
             <artifactId>Slimefun4</artifactId>
-            <version>happy-SNAPSHOT</version>
-            <scope>provided</scope>
+            <version>DEV-SNAPSHOT</version>
+            <scope>system</scope>
+            <systemPath>d:/Users/Administrator/Desktop/Java项目/slimefun/Slimefun4-master/target/Slimefun-DEV-SNAPSHOT.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.bstats</groupId>
